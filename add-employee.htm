@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add Employee - EmployeeSpace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-white to-rose-50 text-gray-900">
+
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-fuchsia-700 to-rose-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-extrabold">EmployeeSpace</h1>
+      <nav class="space-x-6 text-sm font-medium">
+        <a href="dashboard.htm" class="hover:underline">Dashboard</a>
+        <a href="employees.htm" class="hover:underline">View Employees</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Add Employee Form -->
+  <section class="min-h-screen flex items-center justify-center py-20 px-4 relative bg-white">
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551836022-d5d88e9218df')] bg-cover bg-center opacity-10"></div>
+
+    <div class="bg-white bg-opacity-95 backdrop-blur-md p-10 rounded-xl shadow-lg w-full max-w-lg z-10">
+      <h2 class="text-3xl font-bold text-center text-rose-700 mb-6">Add New Employee</h2>
+
+      <form id="addEmployeeForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Employee ID</label>
+          <input type="number" id="employeeId" required class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Name</label>
+          <input type="text" id="name" required class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Email</label>
+          <input type="email" id="email" required class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Phone</label>
+          <input type="text" id="phone" required class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Address</label>
+          <input type="text" id="address" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Top Skills</label>
+          <input type="text" id="skills" placeholder="e.g. React, Node.js" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+
+        <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 rounded-md transition">Add Employee</button>
+        <p id="successMsg" class="text-green-600 font-semibold text-center hidden mt-4">✅ Employee added successfully!</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Firebase & Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsAIu6k-FEGTYMxURGAZJhi9XqSiHmb2E",
+      authDomain: "employeespace-12537.firebaseapp.com",
+      projectId: "employeespace-12537"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("addEmployeeForm");
+    const successMsg = document.getElementById("successMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const employee = {
+        employeeId: document.getElementById("employeeId").value,
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        address: document.getElementById("address").value,
+        skills: document.getElementById("skills").value,
+        createdAt: new Date().toISOString()
+      };
+
+      try {
+        await addDoc(collection(db, "employees"), employee);
+        form.reset();
+        successMsg.classList.remove("hidden");
+        setTimeout(() => successMsg.classList.add("hidden"), 3000);
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

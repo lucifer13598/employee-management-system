@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings - EmployeeSpace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-white to-rose-50 text-gray-900 min-h-screen">
+
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-fuchsia-700 to-rose-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-extrabold">EmployeeSpace</h1>
+      <nav class="space-x-6 text-sm font-medium">
+        <a href="dashboard.htm" class="hover:underline">Dashboard</a>
+        <a href="employees.htm" class="hover:underline">Employees</a>
+        <a href="settings.htm" class="underline font-semibold">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Settings Section -->
+  <main class="max-w-4xl mx-auto py-12 px-6">
+    <h2 class="text-3xl font-bold text-rose-700 mb-6">Settings & Policies</h2>
+
+    <!-- Usage Instructions -->
+    <section class="mb-10 bg-white p-6 rounded-lg shadow border">
+      <h3 class="text-xl font-semibold text-fuchsia-800 mb-3">🔧 Usage Instructions</h3>
+      <ul class="list-disc list-inside text-gray-700 space-y-2">
+        <li>Admins can add and manage employees, attendance, and leave requests.</li>
+        <li>Each employee must be assigned a unique Employee ID.</li>
+        <li>Leave requests can be submitted for a maximum of 4 days.</li>
+        <li>All company profile details must be accurate and up to date.</li>
+        <li>Messages should be respectful and relevant to company matters only.</li>
+      </ul>
+    </section>
+
+    <!-- Policies -->
+    <section class="mb-10 bg-white p-6 rounded-lg shadow border">
+      <h3 class="text-xl font-semibold text-fuchsia-800 mb-3">📜 Privacy & Data Policy</h3>
+      <p class="text-gray-700 leading-relaxed">
+        EmployeeSpace values your privacy. All data including employee records, attendance, and company details are stored securely on our servers using Firebase infrastructure.
+        <br/><br/>
+        We do not sell or share any data with third parties. Access to data is limited to authenticated users within your organization only.
+        <br/><br/>
+        Uploaded documents or images are stored securely and may be deleted upon request or account termination.
+      </p>
+    </section>
+
+    <!-- Terms -->
+    <section class="bg-white p-6 rounded-lg shadow border">
+      <h3 class="text-xl font-semibold text-fuchsia-800 mb-3">📘 Terms of Use</h3>
+      <ul class="list-disc list-inside text-gray-700 space-y-2">
+        <li>Users must provide correct and verifiable information at all times.</li>
+        <li>Unauthorized access or misuse of the platform is strictly prohibited.</li>
+        <li>We reserve the right to suspend or delete any account found violating policies.</li>
+        <li>Platform updates may occur without prior notice to ensure system security and integrity.</li>
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-fuchsia-900 text-white text-center py-4 text-sm mt-10">
+    <p>© 2025 EmployeeSpace. All rights reserved.</p>
+  </footer>
+</body>
+</html>

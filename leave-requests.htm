@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Leave Requests - EmployeeSpace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-white to-rose-50 text-gray-900 min-h-screen">
+
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-fuchsia-700 to-rose-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-extrabold">EmployeeSpace</h1>
+      <nav class="space-x-6 text-sm font-medium">
+        <a href="dashboard.htm" class="hover:underline">Dashboard</a>
+        <a href="employees.htm" class="hover:underline">Employees</a>
+        <a href="attendance.htm" class="hover:underline">Attendance</a>
+        <a href="leave-requests.htm" class="underline font-semibold">Leave Requests</a>
+        <a href="messages.htm" class="hover:underline">Messages</a>
+        <a href="company-profile.htm" class="hover:underline">Company Profile</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto py-10 px-4">
+
+    <!-- Leave Request Form -->
+    <section class="mb-10">
+      <h2 class="text-2xl font-bold text-rose-700 mb-4">Submit Leave Request</h2>
+      <form id="leaveForm" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white p-6 rounded shadow">
+        <input type="text" id="employeeId" placeholder="Employee ID" required class="border px-3 py-2 rounded" />
+        <input type="text" id="reason" placeholder="Reason" required class="border px-3 py-2 rounded" />
+        <input type="date" id="fromDate" required class="border px-3 py-2 rounded" />
+        <input type="date" id="toDate" required class="border px-3 py-2 rounded" />
+        <div class="md:col-span-2">
+          <button type="submit" class="bg-fuchsia-600 text-white px-6 py-2 rounded hover:bg-fuchsia-700">
+            Submit Request
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- List of Requests -->
+    <section>
+      <h2 class="text-2xl font-bold text-rose-700 mb-4">Pending Leave Requests</h2>
+      <div id="leaveContainer" class="space-y-4">
+        <!-- Requests will load here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-fuchsia-900 text-white text-center py-4 text-sm mt-12">
+    <p>© 2025 EmployeeSpace. All rights reserved.</p>
+  </footer>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore, collection, query, where, onSnapshot,
+      doc, updateDoc, addDoc, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsAIu6k-FEGTYMxURGAZJhi9XqSiHmb2E",
+      authDomain: "employeespace-12537.firebaseapp.com",
+      projectId: "employeespace-12537",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const leaveContainer = document.getElementById("leaveContainer");
+
+    // Listen for real-time leave requests
+    const q = query(collection(db, "leaveRequests"), where("status", "==", "Pending"));
+    onSnapshot(q, (snapshot) => {
+      leaveContainer.innerHTML = "";
+      if (snapshot.empty) {
+        leaveContainer.innerHTML = "<p class='text-gray-600'>No pending requests.</p>";
+        return;
+      }
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "bg-white p-4 rounded shadow border-l-4 border-yellow-500";
+
+        div.innerHTML = `
+          <div class="mb-2">
+            <p><strong>Employee ID:</strong> ${data.employeeId}</p>
+            <p><strong>Reason:</strong> ${data.reason}</p>
+            <p><strong>From:</strong> ${data.fromDate} &nbsp; <strong>To:</strong> ${data.toDate}</p>
+          </div>
+          <div class="flex gap-4">
+            <button class="bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700" data-id="${docSnap.id}" data-action="Approved">Approve</button>
+            <button class="bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700" data-id="${docSnap.id}" data-action="Rejected">Reject</button>
+          </div>
+        `;
+
+        leaveContainer.appendChild(div);
+      });
+    });
+
+    // Handle approve/reject
+    leaveContainer.addEventListener("click", async (e) => {
+      if (e.target.tagName === "BUTTON") {
+        const id = e.target.getAttribute("data-id");
+        const action = e.target.getAttribute("data-action");
+        if (confirm(`Are you sure you want to ${action.toLowerCase()} this leave request?`)) {
+          const ref = doc(db, "leaveRequests", id);
+          await updateDoc(ref, { status: action });
+          alert(`Request ${action.toLowerCase()} successfully.`);
+        }
+      }
+    });
+
+    // Handle Leave Request Submission
+    document.getElementById("leaveForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const employeeId = document.getElementById("employeeId").value.trim();
+      const reason = document.getElementById("reason").value.trim();
+      const fromDate = document.getElementById("fromDate").value;
+      const toDate = document.getElementById("toDate").value;
+
+      if (!employeeId || !reason || !fromDate || !toDate) {
+        alert("Please fill out all fields.");
+        return;
+      }
+
+      await addDoc(collection(db, "leaveRequests"), {
+        employeeId,
+        reason,
+        fromDate,
+        toDate,
+        status: "Pending",
+        timestamp: serverTimestamp()
+      });
+
+      alert("Leave request submitted successfully.");
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>

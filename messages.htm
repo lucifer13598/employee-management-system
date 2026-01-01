@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Messages - EmployeeSpace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-100 via-white to-rose-50 text-gray-900 min-h-screen">
+
+  <!-- Navbar -->
+  <header class="bg-gradient-to-r from-fuchsia-700 to-rose-600 text-white shadow-md">
+    <div class="max-w-7xl mx-auto flex justify-between items-center p-4">
+      <h1 class="text-2xl font-extrabold">EmployeeSpace</h1>
+      <nav class="space-x-6 text-sm font-medium">
+        <a href="dashboard.htm" class="hover:underline">Dashboard</a>
+        <a href="add-employee.htm" class="hover:underline">Add Employee</a>
+        <a href="employees.htm" class="hover:underline">View Employees</a>
+        <a href="leave-requests.htm" class="hover:underline">Leave Request</a>
+        <a href="company-profile.htm" class="hover:underline">Company Profile</a>
+        <a href="messages.htm" class="hover:underline font-bold underline">Messages</a>
+        <a href="settings.htm" class="hover:underline">Settings</a>
+        <a href="logout.htm" class="hover:underline text-red-300">Logout</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="max-w-4xl mx-auto p-6 space-y-10">
+    <section class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold text-rose-700 mb-4">Send a Message</h2>
+      <form id="messageForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium">Your Name</label>
+          <input type="text" id="sender" required class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400">
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Message</label>
+          <textarea id="message" required rows="4" class="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-rose-400"></textarea>
+        </div>
+        <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2 px-6 rounded-md">Send Message</button>
+        <p id="msgSuccess" class="text-green-600 mt-3 hidden font-medium">Message sent successfully.</p>
+      </form>
+    </section>
+
+    <section class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-2xl font-bold text-fuchsia-700 mb-4">All Messages</h2>
+      <ul id="messagesList" class="space-y-4 text-sm">
+        <!-- Messages will be shown here -->
+      </ul>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-fuchsia-900 text-white text-center py-4 text-sm mt-12">
+    © 2025 EmployeeSpace. All rights reserved.
+  </footer>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsAIu6k-FEGTYMxURGAZJhi9XqSiHmb2E",
+      authDomain: "employeespace-12537.firebaseapp.com",
+      projectId: "employeespace-12537"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("messageForm");
+    const messagesList = document.getElementById("messagesList");
+    const successMsg = document.getElementById("msgSuccess");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const sender = document.getElementById("sender").value;
+      const message = document.getElementById("message").value;
+
+      try {
+        await addDoc(collection(db, "messages"), {
+          sender,
+          message,
+          timestamp: serverTimestamp()
+        });
+
+        form.reset();
+        successMsg.classList.remove("hidden");
+        setTimeout(() => successMsg.classList.add("hidden"), 3000);
+        loadMessages();
+      } catch (err) {
+        alert("Error sending message: " + err.message);
+      }
+    });
+
+    async function loadMessages() {
+      const snap = await getDocs(collection(db, "messages"));
+      messagesList.innerHTML = "";
+      snap.forEach((doc) => {
+        const data = doc.data();
+        messagesList.innerHTML += `
+          <li class="bg-gray-50 p-4 rounded-md border border-gray-200">
+            <p><strong>${data.sender}</strong>:</p>
+            <p class="text-gray-700 mt-1">${data.message}</p>
+          </li>
+        `;
+      });
+    }
+
+    loadMessages();
+  </script>
+</body>
+</html>
